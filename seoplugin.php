@@ -27,4 +27,4 @@ defined( 'ABSPATH' ) || die();
 require_once 'constants.php';
 require_once 'autoloader.php';
 
-\SEOPlugin\Core\WP_Hooks::initialize( __FILE__ );
+Core\WP_Hooks::initialize( __FILE__ );
