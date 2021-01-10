@@ -1,0 +1,1 @@
+This is where you put frontend assets such as fonts, images, CSS and Javascript if you have any.
