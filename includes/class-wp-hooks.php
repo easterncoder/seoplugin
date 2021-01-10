@@ -1,4 +1,8 @@
 <?php
+/**
+ * @package SEOPlugin
+ */
+
 namespace SEOPlugin\Core;
 
 /**

@@ -1,8 +1,9 @@
 <?php
 /**
  * @package seo-plugin
- * @author Mike Lopez
  */
+
+defined( 'ABSPATH' ) || die();
 
 /**
  * Auto load classes in:
