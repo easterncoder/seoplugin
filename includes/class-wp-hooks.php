@@ -22,7 +22,7 @@ class WP_Hooks {
    * @wp-hook register_activation_hook
    */
 	static function activate() {
-		SEOPlugin\Core\Database::initialize();
+		Database::initialize();
 	}
 
   /**
