@@ -1,7 +1,15 @@
 <?php
 namespace SEOPlugin\Core;
 
+/**
+ * WP_Hooks class
+ * Handles registration of WordPress hooks (actions and filters)
+ */
 class WP_Hooks {
+	/**
+	 * Register hooks
+	 * @param  string $file Plugin file
+	 */
 	static function initialize( $file ) {
 		register_activation_hook( $file, array( __CLASS__, 'activate' ) );
 		register_deactivation_hook( $file, array( __CLASS__, 'deactivate' ) );
