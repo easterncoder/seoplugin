@@ -25,8 +25,15 @@ namespace SEOPlugin;
 
 defined( 'ABSPATH' ) || die();
 
+/**
+ * Plugin file path
+ *
+ * @var string
+ */
+const PLUGIN_FILE = __FILE__;
 require_once 'constants.php';
+
 require_once 'autoloader.php';
 
-Core\WP_Hooks::initialize( __FILE__ );
+Core\WP_Hooks::initialize();
 Core\Features::load();

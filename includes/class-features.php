@@ -36,7 +36,7 @@ class Features {
 	 */
 	static function get() {
 		$features = array();
-		foreach ( glob( \SEOPlugin\PATH . '/features/*/config.php' ) as $feature ) {
+		foreach ( glob( \SEOPlugin\PLUGIN_DIR . '/features/*/config.php' ) as $feature ) {
 			$name = $id = '';
 			require $feature;
 			if ( empty( $name ) || empty( $id ) ) {

@@ -8,25 +8,28 @@ namespace SEOPlugin\Core;
 class WP_Hooks {
 	/**
 	 * Register hooks
+	 *
 	 * @param  string $file Plugin file
 	 */
-	static function initialize( $file ) {
-		register_activation_hook( $file, array( __CLASS__, 'activate' ) );
-		register_deactivation_hook( $file, array( __CLASS__, 'deactivate' ) );
+	static function initialize() {
+		register_activation_hook( \SEOPlugin\PLUGIN_FILE, array( __CLASS__, 'activate' ) );
+		register_deactivation_hook( \SEOPlugin\PLUGIN_FILE, array( __CLASS__, 'deactivate' ) );
 	}
 
-  /**
-   * Plugin activation routine
-   * @wp-hook register_activation_hook
-   */
+	/**
+	 * Plugin activation routine
+	 *
+	 * @wp-hook register_activation_hook
+	 */
 	static function activate() {
 		Database::initialize();
 	}
 
-  /**
-   * Plugin deactivation routine
-   * @wp-hook register_deactivation_hook
-   */
+	/**
+	 * Plugin deactivation routine
+	 *
+	 * @wp-hook register_deactivation_hook
+	 */
 	static function deactivate() {}
 
 }
