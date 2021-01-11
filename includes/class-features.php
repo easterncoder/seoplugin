@@ -11,6 +11,13 @@ namespace SEOPlugin\Core;
  */
 class Features {
 	/**
+	 * Features initialization
+	 */
+	static function initialize() {
+		add_action( 'admin_action_seoplugin-toggle-features', array( __CLASS__, 'toggle_features' ) );
+		self::load();
+	}
+	/**
 	 * Load enabled features
 	 *
 	 * @wp-hook plugins_loaded
@@ -40,13 +47,13 @@ class Features {
 	static function get() {
 		$features = array();
 		foreach ( glob( \SEOPlugin\PLUGIN_DIR . '/features/*/config.php' ) as $feature ) {
-			$name = $id = '';
+			$name = $id = $description = '';
 			require $feature;
 			if ( empty( $name ) || empty( $id ) ) {
 				continue;
 			}
 			$path            = dirname( $feature );
-			$features[ $id ] = compact( 'name', 'id', 'path' );
+			$features[ $id ] = compact( 'name', 'id', 'path', 'description' );
 		}
 		/**
 		 * Filters the features array
@@ -64,6 +71,32 @@ class Features {
 	 */
 	static function get_enabled() {
 		return (array) Settings::get( 'enabled-features', array( 'sample-feature' ) );
+	}
+
+	/**
+	 * Features toggle form handler
+	 */
+	static function toggle_features() {
+		$enabled_features   = self::get_enabled();
+		$requested_features = (array) $_POST['enabled_features'] ?? array();
+
+		// enable requested features that are not yet enabled
+		foreach ( $requested_features as $feature ) {
+			if ( ! in_array( $feature, $enabled_features ) ) {
+				self::toggle( $feature, true );
+			}
+		}
+
+		// disable enabled features that were not requested
+		foreach ( $enabled_features as $feature ) {
+			if ( ! in_array( $feature, $requested_features ) ) {
+				self::toggle( $feature, false );
+			}
+		}
+
+		Util::set_notice( __( 'Settings saved.', 'seo-plugin' ), 'success' );
+		Util::redirect();
+
 	}
 
 	/**
@@ -107,11 +140,13 @@ class Features {
 			do_action( 'seoplugin-disable-feature', $feature );
 		}
 	}
-	
+
 	/**
 	 * Loads all necessary data then loads the features admin UI
 	 */
 	static function controller() {
+		$features         = self::get();
+		$enabled_features = self::get_enabled();
 		require \SEOPlugin\PLUGIN_DIR . '/admin/features.php';
 	}
 }

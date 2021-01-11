@@ -36,4 +36,4 @@ require_once 'constants.php';
 require_once 'autoloader.php';
 
 Core\WP_Hooks::initialize();
-Core\Features::load();
+Core\Features::initialize();
