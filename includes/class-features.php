@@ -14,7 +14,6 @@ class Features {
 	 * Features initialization
 	 */
 	static function initialize() {
-		add_action( 'admin_action_seoplugin-toggle-features', array( __CLASS__, 'toggle_features' ) );
 		self::load();
 	}
 	/**
@@ -75,6 +74,8 @@ class Features {
 
 	/**
 	 * Features toggle form handler
+	 *
+	 * @wp-hook admin_action_seoplugin-toggle-features
 	 */
 	static function toggle_features() {
 		$enabled_features   = self::get_enabled();

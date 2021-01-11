@@ -21,6 +21,9 @@ class WP_Hooks {
 		add_action( 'admin_init', array( __CLASS__, 'start_session' ) );
 		add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
+
+		add_action( 'admin_action_seoplugin-toggle-features', array( '\SEOPlugin\Core\Features', 'toggle_features' ) );
+		add_action( 'admin_action_seoplugin-save-settings', array( '\SEOPlugin\Core\Settings', 'save_settings' ) );
 	}
 
 	/**
