@@ -10,3 +10,9 @@ $name = 'Sample Feature';
  * @var string
  */
 $id   = 'sample-feature';
+
+/**
+ * Feature description
+ * @var string
+ */
+$description = 'A sample feature for the world to follow';
