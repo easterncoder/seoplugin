@@ -89,5 +89,12 @@ class Settings {
 		$arguments[0] = self::prefix . $arguments[0];
 		return call_user_func_array( $function_name . '_option', $arguments );
 	}
+	
+	/**
+	 * Loads all necessary data then loads the settings admin UI
+	 */
+	static function controller() {
+		require \SEOPlugin\PLUGIN_DIR . '/admin/settings.php';
+	}
 
 }

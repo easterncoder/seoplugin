@@ -107,4 +107,11 @@ class Features {
 			do_action( 'seoplugin-disable-feature', $feature );
 		}
 	}
+	
+	/**
+	 * Loads all necessary data then loads the features admin UI
+	 */
+	static function controller() {
+		require \SEOPlugin\PLUGIN_DIR . '/admin/features.php';
+	}
 }

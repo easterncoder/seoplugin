@@ -50,12 +50,12 @@ class WP_Hooks {
 		 */
 		$main_title = \SEOPlugin\NAME;
 		foreach ( array(
-			array( 'features', __( 'Features', 'seo-plugin' ) ),
-			array( 'settings', __( 'Settings', 'seo-plugin' ) ),
+			array( 'features', __( 'Features', 'seo-plugin' ), ['\SEOPlugin\Core\Features', 'controller'] ),
+			array( 'settings', __( 'Settings', 'seo-plugin' ), ['\SEOPlugin\Core\Settings', 'controller'] ),
 		) as $menu ) {
 
 			// get menu slug and title
-			list($menu, $title) = $menu;
+			list($menu, $title, $controller) = $menu;
 
 			// first menu item is also the top level menu
 			if ( empty( $top_menu ) ) {
@@ -65,7 +65,7 @@ class WP_Hooks {
 					$main_title,
 					'manage_options',
 					$top_menu,
-					array( __CLASS__, 'admin_screen' ),
+					$controller,
 					$icon
 				);
 			}
@@ -77,59 +77,10 @@ class WP_Hooks {
 				$title,
 				'manage_options',
 				'seo-plugin/' . $menu,
-				array( __CLASS__, 'admin_screen' )
+				$controller,
 			);
 
 		}
 
 	}
-
-	/**
-	 * Load admin view for requested menu item
-	 * Loaded via `add_menu_page()` and `add_submenu_page()`
-	 */
-	static function admin_screen() {
-		// generate admin view's file path
-		$page = \SEOPlugin\PLUGIN_DIR . '/admin/' . preg_replace( array( '#^seo-plugin/#', '#\.#' ), '', $_GET['page'] ?: '' ) . '.php';
-
-		if ( file_exists( $page ) && is_file( $page ) ) {
-			// get base part of view
-			$view = preg_replace( '#\.php$#', '', basename( $page ) );
-
-			// view wrapper div
-			echo '<div class="wrap">';
-
-			/**
-			 * Fires before the admin view is loaded
-			 */
-			do_action( 'seoplugin-before-admin-' . $view );
-
-			/**
-			 * Fires before the admin view is loaded
-			 *
-			 * @param string $view
-			 */
-			do_action( 'seoplugin-before-admin', $view );
-
-			// load the view
-			require $page;
-
-			/**
-			 * Fires after the admin view is loaded
-			 */
-			do_action( 'seoplugin-after-admin-' . $view );
-
-			/**
-			 * Fires after the admin view is loaded
-			 *
-			 * @param string $view
-			 */
-			do_action( 'seoplugin-after-admin', $view );
-
-			// close view wrapper div
-			echo '</div>';
-		}
-
-	}
-
 }
