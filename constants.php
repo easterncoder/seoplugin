@@ -6,6 +6,13 @@
 namespace SEOPlugin;
 
 /**
+ * Plugin name
+ * 
+ * @var string
+ */
+const NAME = 'SEO Plugin';
+
+/**
  * Plugin version
  *
  * @var string
