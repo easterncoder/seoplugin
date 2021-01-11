@@ -18,7 +18,9 @@ class WP_Hooks {
 	static function initialize() {
 		register_activation_hook( \SEOPlugin\PLUGIN_FILE, array( __CLASS__, 'activate' ) );
 		register_deactivation_hook( \SEOPlugin\PLUGIN_FILE, array( __CLASS__, 'deactivate' ) );
+		add_action( 'admin_init', array( __CLASS__, 'start_session' ) );
 		add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ) );
+		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 	}
 
 	/**
@@ -38,20 +40,26 @@ class WP_Hooks {
 	static function deactivate() {}
 
 	/**
+	 * Start a PHP session
+	 *
+	 * @wp-hook admin_init
+	 */
+	static function start_session() {
+		if ( session_status() == PHP_SESSION_NONE ) {
+			session_start();
+		}
+	}
+
+	/**
 	 * Add our menu items
 	 *
 	 * @wp-hook admin_menu
 	 */
 	static function admin_menu() {
-		/**
-		 * Main plugin title
-		 *
-		 * @var [type]
-		 */
 		$main_title = \SEOPlugin\NAME;
 		foreach ( array(
-			array( 'features', __( 'Features', 'seo-plugin' ), ['\SEOPlugin\Core\Features', 'controller'] ),
-			array( 'settings', __( 'Settings', 'seo-plugin' ), ['\SEOPlugin\Core\Settings', 'controller'] ),
+			array( 'features', __( 'Features', 'seo-plugin' ), array( '\SEOPlugin\Core\Features', 'controller' ) ),
+			array( 'settings', __( 'Settings', 'seo-plugin' ), array( '\SEOPlugin\Core\Settings', 'controller' ) ),
 		) as $menu ) {
 
 			// get menu slug and title
@@ -79,8 +87,31 @@ class WP_Hooks {
 				'seo-plugin/' . $menu,
 				$controller,
 			);
-
 		}
+	}
 
+	/**
+	 * Displays notices added via Core\Util::set_notice()
+	 *
+	 * @wp-hook admin_notices
+	 */
+	static function admin_notices() {
+		if ( is_array( $_SESSION['seoplugin'] ?? '' ) && is_array( $_SESSION['seoplugin']['notices'] ?? '' ) ) {
+			foreach ( $_SESSION['seoplugin']['notices'] as $type => $messages ) {
+				foreach ( (array) $messages as $message ) {
+					printf( '<div class="notice notice-%s"><p>%s</p></div>', $type, $message );
+				}
+			}
+		}
+		$_SESSION['seoplugin']['notices'] = array();
+
+		if ( is_array( $_SESSION['seoplugin'] ?? '' ) && is_array( $_SESSION['seoplugin']['dismissible-notices'] ?? '' ) ) {
+			foreach ( $_SESSION['seoplugin']['dismissible-notices'] as $type => $messages ) {
+				foreach ( (array) $messages as $message ) {
+					printf( '<div class="notice notice-%s is-dismissible"><p>%s</p></div>', $type, $message );
+				}
+			}
+		}
+		$_SESSION['seoplugin']['dismissible-notices'] = array();
 	}
 }
