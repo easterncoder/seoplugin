@@ -86,7 +86,14 @@ class Settings {
 	 * @return mixed                  Whatever is returned by the called WP Options API function
 	 */
 	protected static function _call_wp( $function_name, $arguments ) {
+		$option       = $arguments[0];
 		$arguments[0] = self::prefix . $arguments[0];
+
+		// run action when settings have been changed
+		if ( $function_name != 'get' && $function_name != 'get_site' ) {
+			do_action( 'seoplugin-settings-change', $option );
+		}
+
 		return call_user_func_array( $function_name . '_option', $arguments );
 	}
 
