@@ -60,13 +60,20 @@ class WP_Hooks {
 	 */
 	static function admin_menu() {
 		$main_title = \SEOPlugin\NAME;
-		foreach ( array(
-			array( 'features', __( 'Features', 'seo-plugin' ), array( '\SEOPlugin\Core\Features', 'controller' ) ),
-			array( 'settings', __( 'Settings', 'seo-plugin' ), array( '\SEOPlugin\Core\Settings', 'controller' ) ),
-		) as $menu ) {
+		
+		$menus = array(
+			'features' => array( 'features', __( 'Features', 'seo-plugin' ), array( '\SEOPlugin\Core\Features', 'controller' ) ),
+			'settings' => array( 'settings', __( 'Settings', 'seo-plugin' ), array( '\SEOPlugin\Core\Settings', 'controller' ) ),
+		);
+		// filter menus
+		$menus = apply_filters( 'seoplugin-menu-items', $menus );
 
+		while ( $menu = array_shift( $menus ) ) {
 			// get menu slug and title
 			list($menu, $title, $controller) = $menu;
+			
+			// filter submenus
+			$children = apply_filters( 'seoplugin-submenu-items', array(), $menu );
 
 			// first menu item is also the top level menu
 			if ( empty( $top_menu ) ) {
@@ -88,8 +95,12 @@ class WP_Hooks {
 				$title,
 				'manage_options',
 				'seo-plugin/' . $menu,
-				$controller,
+				$controller
 			);
+			
+			if( $children ) {
+				$menus = array_merge( $children, $menus );
+			}
 		}
 	}
 
