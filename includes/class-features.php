@@ -113,7 +113,7 @@ class Features {
 		} else {
 			$enabled_features = array_diff( $enabled_features, array( $feature ) );
 		}
-		Settings::update( 'enabled-features', array_unique( $enabled_features ) );
+		Settings::update( 'enabled-features', array_values( array_unique( $enabled_features ) ) );
 		if ( $state ) {
 			self::load( $feature );
 			/**
