@@ -44,7 +44,10 @@ class Features {
 	 * @return array associative array of all valid features in the features
 	 */
 	static function get() {
-		$features = array();
+		static $features = array();
+		if( !empty( $features ) ) {
+			return $features;
+		}
 		foreach ( glob( \SEOPlugin\PLUGIN_DIR . '/features/*/config.php' ) as $feature ) {
 			$name = $id = $description = '';
 			require $feature;
