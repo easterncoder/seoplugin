@@ -89,12 +89,42 @@ class Settings {
 		$option       = $arguments[0];
 		$arguments[0] = self::prefix . $arguments[0];
 
-		// run action when settings have been changed
 		if ( $function_name != 'get' && $function_name != 'get_site' ) {
-			do_action( 'seoplugin-settings-change', $option );
+			// run action when settings have been changed
+			do_action( 'seoplugin-settings-change', $option );			
+			
+			// json_encode non-string and non-numeric data
+			if( !is_string( $arguments[1]) && !is_numeric( $arguments[1] ) ) {
+				$arguments[1] = json_encode( $arguments[1] );
+			}
 		}
 
-		return call_user_func_array( $function_name . '_option', $arguments );
+		$result = call_user_func_array( $function_name . '_option', $arguments );
+		
+		// attempt to json_decode result from get_ or and get_site_ calls
+		if( $function_name == 'get' || $function_name == 'get_site' ) {
+			// return non-string results as-is
+			if( !is_string( $result ) ) {
+				return $result;
+			}
+			
+			// attempt to json_decode result
+			switch( $result ) {
+				case 'null':
+					$result = null;
+					break;
+				case 'true':
+					$result = true;
+					break;
+				case 'false':
+					$result = false;
+					break;
+				default:
+					$result = json_decode( $result, true ) ?: $result;
+			}
+		}
+		
+		return $result;
 	}
 
 	/**
