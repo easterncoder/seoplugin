@@ -21,6 +21,7 @@ class WP_Hooks {
 		add_action( 'admin_init', array( __CLASS__, 'start_session' ) );
 		add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_scripts' ) );
 
 		add_action( 'admin_action_seoplugin-toggle-features', array( '\SEOPlugin\Core\Features', 'toggle_features' ) );
 		add_action( 'admin_action_seoplugin-save-settings', array( '\SEOPlugin\Core\Settings', 'save_settings' ) );
@@ -127,5 +128,38 @@ class WP_Hooks {
 			}
 		}
 		$_SESSION['seoplugin']['dismissible-notices'] = array();
+	}
+	
+	/**
+	 * Enqueues admin scripts and styles
+	 *
+	 * @wp-hook admin_enqueue_scripts
+	 * 
+	 * @param  string $hook Current admin page
+	 */
+	static function enqueue_scripts( $hook ) {
+		if( !preg_match( '#^(seo-plugin_page_seo-plugin/|toplevel_page_seo-plugin/)(.*)$#', $hook, $path ) ) {
+			// only on our screens
+			return;
+		}
+		// WP's thickbox
+		add_thickbox();
+		
+		$path = explode( '/', $path[2] );
+		
+		// load feature specific css and js found in feature's assets folder
+		if( $path[0] == 'features' && !empty( $path[1] ) ) {
+			$features = \SEOPlugin\Core\Features::get();
+			if( isset( $features[$path[1]] ) ) {
+				// js
+				foreach( glob( $features[$path[1]]['path'] . '/assets/*.js' ) as $js ) {
+					wp_enqueue_script( str_replace( array( dirname( \SEOPlugin\PLUGIN_DIR ) . '/', '/', '.js' ), array( '', '-', '' ), $js ), plugins_url( basename( $js ), $js ), array(), \SEOPlugin\VERSION );
+				}
+				// css
+				foreach( glob( $features[$path[1]]['path'] . '/assets/*.css' ) as $css ) {
+					wp_enqueue_style( str_replace( array( dirname( \SEOPlugin\PLUGIN_DIR ) . '/', '/', '.css' ), array( '', '-', '' ), $css ), plugins_url( basename( $css ), $css ), array(), \SEOPlugin\VERSION );
+				}
+			}
+		}
 	}
 }
