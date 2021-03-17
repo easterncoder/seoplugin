@@ -109,8 +109,10 @@ class Sitemap {
 							)
 						);
 						if ( $latest_post ) {
-							$sitemap .= '<lastmod>' . str_replace( ' ', 'T', $latest_post[0]->post_modified_gmt ) . '+00:00' . '</lastmod>';
+							$sitemap .= '<lastmod>' . str_replace( ' ', 'T', $latest_post[0]->post_date_gmt ) . '+00:00' . '</lastmod>';
 						}
+						$now = time();
+						$sitemap .= self::priority( $latest_post ? $latest_post[0]->post_date_gmt . ' +00:00' : time(), 'taxonomy' );
 						$sitemap .= '</url>';
 					}
 					break;
@@ -119,7 +121,8 @@ class Sitemap {
 						$sitemap .= '<url>';
 						// $sitemap .= '<priority>1</priority><changefreq>daily</changefreq>';
 						$sitemap .= '<loc>' . get_author_posts_url( $author->post_author ) . '</loc>';
-						$sitemap .= '<lastmod>' . str_replace( ' ', 'T', $author->post_modified_gmt ) . '+00:00' . '</lastmod>';
+						$sitemap .= '<lastmod>' . str_replace( ' ', 'T', $author->post_date_gmt ) . '+00:00' . '</lastmod>';
+						$sitemap .= self::priority( $author->post_date_gmt . ' +00:00', 'author' );
 						$sitemap .= '</url>';
 					}
 					break;
@@ -130,15 +133,15 @@ class Sitemap {
 						if ( $first ) {
 							$first    = false;
 							$sitemap .= '<url>';
-							// $sitemap .= '<priority>1</priority><changefreq>daily</changefreq>';
 							$sitemap .= '<loc>' . home_url( '/' ) . '</loc>';
-							$sitemap .= '<lastmod>' . str_replace( ' ', 'T', $post->post_modified_gmt ) . '+00:00' . '</lastmod>';
+							$sitemap .= '<lastmod>' . str_replace( ' ', 'T', $post->post_date_gmt ) . '+00:00' . '</lastmod>';
+							$sitemap .= self::priority( $post->post_date_gmt . ' +00:00', 'homepage' );
 							$sitemap .= '</url>';
 						}
 						$sitemap .= '<url>';
-						// $sitemap .= '<priority>1</priority><changefreq>daily</changefreq>';
 						$sitemap .= '<loc>' . get_permalink( $post->ID ) . '</loc>';
-						$sitemap .= '<lastmod>' . str_replace( ' ', 'T', $post->post_modified_gmt ) . '+00:00' . '</lastmod>';
+						$sitemap .= '<lastmod>' . str_replace( ' ', 'T', $post->post_date_gmt ) . '+00:00' . '</lastmod>';
+						$sitemap .= self::priority( $post->post_date_gmt . ' +00:00', $post->post_type );
 						$sitemap .= '</url>';
 					}
 			}
@@ -167,7 +170,56 @@ class Sitemap {
 			\SEOPlugin\Core\Settings::update( 'sitemaps-sitemap.xml', $sitemap );
 		}
 	}
-
+	
+	/**
+	 * Generates priority tag
+	 * @param  string        $date          Content Date
+	 * @param  string|null   $content_type  Content Type
+	 * @return string                       Priority in the format <priority>{x}</priority>
+	 */
+	static function priority( $date, $content_type = null ) {
+		static $logic;
+		
+		$logic = $logic ?: \SEOPlugin\Core\Settings::get( 'sitemaps-priority-logic', 'site-architecture' );
+		switch( $logic ) {
+			case 'site-architecture':
+				switch( $content_type ) {
+					case 'homepage' :
+						$priority = 1;
+						break;
+					case 'taxonomy' :
+					case 'page' :
+						$priority = .9;
+						break;
+					case 'post' :
+					default :
+						$priority = .8;
+						break;
+				}
+				break;
+			case 'date':
+				switch ( $content_type ) {
+					case 'homepage' :
+						$priority = 1;
+						break;
+					default:
+						$now = time();
+						$date = strtotime( $date );
+						$priority = .9 - floor( ( $now - $date ) / MONTH_IN_SECONDS ) / 10;
+						if( $priority < .1 ) {
+							$priority = .1;
+						}
+						break;
+				}
+				break;
+			case 'disabled':
+			default:
+				$priority = 0;
+				break;
+		}
+		return $priority ? '<priority>' . $priority . '</priority>' : '';
+	}
+	
 	/**
 	 * Resets sitemap data
 	 */

@@ -76,6 +76,9 @@ class WP_Hooks {
 		// get if authors are enabled for sitemaps
 		$sitemaps_enable_authors = \SEOPlugin\Core\Settings::get( 'sitemaps-enable-authors', false );
 
+		// get sitemap priority logic settings
+		$sitemaps_priority_logic = \SEOPlugin\Core\Settings::get( 'sitemaps-priority-logic', 'site-architecture' );
+
 		// config data
 		$config = $this->config;
 
